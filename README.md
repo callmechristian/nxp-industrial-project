@@ -1,2 +1,2 @@
-# industrial-project
+# Industrial Project
 Industrial project for Polytech
