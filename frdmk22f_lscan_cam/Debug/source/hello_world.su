@@ -1,5 +1,0 @@
-C:\Users\siman\OneDrive\Desktop\SA\NXP-CUP\nxp-industrial-project\frdmk22f_lscan_cam\drivers/fsl_gpio.h:319:20:GPIO_PinWrite	24	static
-../source/hello_world.c:57:6:setCamCLK	16	static
-../source/hello_world.c:70:6:setCamSI	16	static
-../source/hello_world.c:84:10:getCamAO	4	static
-../source/hello_world.c:94:5:main	16	static

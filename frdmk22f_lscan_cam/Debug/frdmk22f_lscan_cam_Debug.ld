@@ -6,7 +6,7 @@
  * Generated linker script file for MK22FN512xxx12
  * Created from linkscript.ldt by FMCreateLinkLibraries
  * Using Freemarker v2.3.30
- * MCUXpresso IDE v11.6.1 [Build 8255] [2022-10-03] on Nov 25, 2022, 4:39:31 PM
+ * MCUXpresso IDE v11.6.1 [Build 8255] [2022-10-03] on Nov 25, 2022, 5:12:13 PM
  */
 
 INCLUDE "frdmk22f_lscan_cam_Debug_library.ld"
