@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
 
-arduino = serial.Serial(port = 'COM11', baudrate=115200, timeout=0.1)
+arduino = serial.Serial(port = 'COM6', baudrate=115200, timeout=0.1)
 
 nx = 5
 ny = 128

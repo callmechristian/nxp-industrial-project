@@ -116,12 +116,6 @@ int main(void)
     BOARD_InitBootClocks();
     BOARD_InitDebugConsole();
 
-    /* Initialize DMAMUX. */
-	DMAMUX_Configuration();
-
-	/* Initialize ADC16. */
-    ADC16_Configuration();
-
     PRINTF("hello world.\r\n");
 
     // main reading loop
