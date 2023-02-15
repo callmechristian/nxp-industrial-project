@@ -11,15 +11,15 @@ import serial
 from matplotlib.animation import FuncAnimation
 
 
-ser = serial.Serial('COM6', 115200, timeout=0)
+ser = serial.Serial('COM4', 9600, timeout=0.1)
 
 # creating subplot and figure
 fig = plt.figure()
 ax = fig.add_subplot(111)
 hl, = ax.plot([], [])
 
-# all data packages have 127 values
-x = np.linspace(0, 127, 127)
+# all data packages have 128 values
+x = np.linspace(0, 126, 126)
 
 # setting labels
 plt.xlabel("128 Pixel Array")
@@ -32,24 +32,34 @@ plt.ion()
 def update_line(hl, new_data):
     hl.set_xdata(x)
     hl.set_ydata(new_data)
-    # plt.draw()
+    plt.draw()
     
-
+fig.show()
 while True:
-  line = ser.readline().decode()
+  line = str(ser.readline().decode())
+
   if(line):
     data = line.strip()
 
     data = data.split(",")
     data = data[:len(data)-2]
-    print(data)
+    print(len(data))
     for i in range(0,len(data)):
-        data[i] = int(data[i])
+      if data[i] == '':
+        data[i] = 0
+      data[i] = int(data[i])
 
-    update_line(hl, data)
+    # update_line(hl, data)
+    ax.plot(x, data)
+    fig.show()
+    print(data)
+    break
     
-    print("Updated.")
-    fig.canvas.draw()
+    # print("Updated.")
+    
+    if(len(data) == 126):
+      fig.canvas.draw()
+      
   # print(data)
 # time.sleep(2)
 
