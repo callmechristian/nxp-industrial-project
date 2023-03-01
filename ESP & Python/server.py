@@ -16,7 +16,7 @@ import socket
 BUFFER_SIZE = 1024
 hostname = '0.0.0.0'
 port = 5555
-testRun = 1 # Flag
+testRun = 0 # Flag
 
 # Sockets
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -34,23 +34,24 @@ def sendCommand(client, command):
 while True:
     try:
         data = s.recvfrom(BUFFER_SIZE)
-        message = data[0].strip()
+        message = data[0].strip().decode()
         if(len(message)==0):
             break
         elif (message=="STARTUP"):
             print("STARTUP message received from ESP")
             if(testRun == 1):
-                s.sendto("CALIBRATION", data[1])
+                s.sendto(str.encode("CALIBRATION"), data[1])
                 print("Calibration successful message sent to the ESP")
             elif(testRun == 0):
-                s.sendto("HANDSHAKE", data[1])
+                s.sendto(str.encode("HANDSHAKE"), data[1])
                 print("Handshake successful message sent to the ESP")
         elif (message=="Bye"):
             break
         else:
             print(message)
     except Exception as e:
-        print("Exiting with Error")
+        print("Exiting with Error", e)
+        break
         s.close()
 print("Closing the connection")
 s.close()
