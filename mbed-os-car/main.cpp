@@ -23,7 +23,8 @@
 
 int main()
 {
-    scan();
+    continousScan();
+    // scan();
     // scan_2();
     // while(true)
     // {
