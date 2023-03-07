@@ -7,5 +7,5 @@
 
 
 namespace Camera {
-    void calculateSteer();
+    void calculateSteer(const int (&cameraData_)[128]);
 }

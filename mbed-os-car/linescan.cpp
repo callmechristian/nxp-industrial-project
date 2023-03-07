@@ -7,7 +7,7 @@ DigitalOut led1(LED1);
 DigitalOut clk(D13);
 DigitalOut si(D10);
 AnalogIn analogIn(A0);
-// BufferedSerial serial(USBTX, USBRX); // tx, rx
+BufferedSerial serialPC(USBTX, USBRX); // tx, rx /
 
 // TODO: be able to use printf instead of serial.write: https://os.mbed.com/docs/mbed-os/v6.16/apis/serial-uart-apis.html
 BufferedSerial serial(D1, D0); // tx, rx
@@ -25,9 +25,10 @@ namespace Camera{
 
         while(1)
         {
+            // std::cout << "efijfpa" << std::endl;
             readAnalog();
-            // sendReading();
-            calculateSteer();
+            sendReading();
+            // calculateSteer(cameraData);
         }
     }
 
@@ -79,7 +80,8 @@ namespace Camera{
             clockPulse();
         }
 
-        wait_us(25000);
+        // wait_us(25000);
+        wait_us(25);
     }
 
     void sendReading()
@@ -90,9 +92,11 @@ namespace Camera{
             std::string s = std::to_string(cameraData[i])+",";
             // std::cout << s;
             serial.write(&s, s.size());
+            serialPC.write(&s, s.size());
         }
         // std::cout << "," << std::endl;
         serial.write((char*)",\n",2);
+        serialPC.write((char*)",\n",2);
         // serial.write((int*) foo, 4*128);
     }
 
