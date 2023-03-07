@@ -5,7 +5,7 @@
 
 #include "InterfaceDigitalOut.h"
 #include "PinNames.h"
-#include "PwmOut.h"
+
 #include "mbed.h"
 #include <cstdio>
 #include <cstdlib>
@@ -13,23 +13,27 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include "pwm.h"
-#include "linescan.h"
+#include "Servo.h"
+#include "RearMotors.h"
 
-
-
-// Blinking rate in milliseconds
-#define BLINKING_RATE     500ms
+using namespace Servo;
+using namespace RearMotors;
 
 int main()
 {
-    scan();
-    // scan_2();
-    // while(true)
-    // {
-    //     scan();
-        
-        
-    //     ThisThread::sleep_for(BLINKING_RATE);
-    // }
+    std::cout << "heyla\n";
+    initializeRearMotors();    
+    initializeServo();
+    std::cout << "pizza\n";
+    move(42);
+    wait_us(4000000);
+    steer(60);
+    wait_us(4000000);
+    move(50);
+    std::cout << "hghghg\n";
+    wait_us(4000000);
+    steer(40);
+    wait_us(4000000);
+
 }
+ 
