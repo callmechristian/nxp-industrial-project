@@ -1,0 +1,10 @@
+.build
+.mbed
+projectfiles
+*.py*
+
+*
+
+!.gitignore
+!*.cpp
+!*.h

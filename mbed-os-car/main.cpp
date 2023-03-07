@@ -15,22 +15,18 @@
 
 #include "pwm.h"
 #include "linescan.h"
-
-
+#include "steering.h"
 
 // Blinking rate in milliseconds
 #define BLINKING_RATE     500ms
+Thread steeringThread;
 
+using namespace Camera;
+// using namespace M;
 int main()
 {
+    // steeringThread.start(calculateSteer);
     continousScan();
-    // scan();
-    // scan_2();
-    // while(true)
-    // {
-    //     scan();
-        
-        
-    //     ThisThread::sleep_for(BLINKING_RATE);
-    // }
+
+    // calculateSteer();
 }
