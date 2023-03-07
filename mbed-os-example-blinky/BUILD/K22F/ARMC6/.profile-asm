@@ -1,0 +1,17 @@
+{
+    "flags": [
+        "--cpu=Cortex-M4",
+        "--ide=mbed"
+    ],
+    "macros": [],
+    "symbols": [
+        "ARM_MATH_CM4",
+        "CPU_MK22FN512VLH12",
+        "FSL_RTOS_MBED",
+        "MBED_TICKLESS",
+        "__CMSIS_RTOS",
+        "__CORTEX_M4",
+        "__FPU_PRESENT=1",
+        "__MBED_CMSIS_RTOS_CM"
+    ]
+}

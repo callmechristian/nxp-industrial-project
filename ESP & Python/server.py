@@ -16,7 +16,7 @@ import socket
 BUFFER_SIZE = 1024
 hostname = '0.0.0.0'
 port = 5555
-testRun = 1 # Flag
+testRun = 0 # Flag
 
 # Sockets
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -35,6 +35,7 @@ while True:
     try:
         data = s.recvfrom(BUFFER_SIZE)
         message = data[0].strip()
+        message = message.decode("utf-8")
         if(len(message)==0):
             break
         elif (message=="STARTUP"):
@@ -50,7 +51,7 @@ while True:
         else:
             print(message)
     except Exception as e:
-        print("Exiting with Error")
+        print("Exiting with Error", e)
         s.close()
 print("Closing the connection")
 s.close()
