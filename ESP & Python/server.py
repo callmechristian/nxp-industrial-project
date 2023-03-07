@@ -31,6 +31,8 @@ def sendCommand(client, command):
         return 1
     return 0
 
+
+
 while True:
     try:
         data = s.recvfrom(BUFFER_SIZE)
@@ -52,6 +54,6 @@ while True:
     except Exception as e:
         print("Exiting with Error", e)
         break
-        s.close()
+        
 print("Closing the connection")
 s.close()
