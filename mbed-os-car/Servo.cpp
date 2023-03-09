@@ -10,7 +10,7 @@ mbed::PwmOut servo(D4);
 namespace Servo{
  void initializeServo(){
 
-    std::cout << "Initializing rear escs... ";
+    std::cout << "Initializing servos... ";
     servo.period(0.020f);
     std::cout << "..Done\n";
  }
