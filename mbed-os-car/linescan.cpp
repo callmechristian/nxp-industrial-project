@@ -1,5 +1,6 @@
 #include "linescan.h"
 #include "steering.h"
+#include <string>
 
 
 // PINS
@@ -11,6 +12,8 @@ BufferedSerial serialPC(USBTX, USBRX); // tx, rx /
 
 // TODO: be able to use printf instead of serial.write: https://os.mbed.com/docs/mbed-os/v6.16/apis/serial-uart-apis.html
 BufferedSerial serial(D1, D0); // tx, rx
+#include "Servo.h" 
+
 
 
 namespace Camera{
@@ -27,8 +30,11 @@ namespace Camera{
         {
             // std::cout << "efijfpa" << std::endl;
             readAnalog();
-            sendReading();
+            // sendReading();
+
+            // wait_us(1000000);
             // calculateSteer(cameraData);
+            steer();
         }
     }
 
@@ -90,6 +96,7 @@ namespace Camera{
         for (int i = 0; i < 128; i++)
         {
             std::string s = std::to_string(cameraData[i])+",";
+
             // std::cout << s;
             serial.write(&s, s.size());
             serialPC.write(&s, s.size());
@@ -115,6 +122,96 @@ namespace Camera{
         }
         // std::cout << "EndArray";
         std::cout << "\n";
+    }
+
+    void steer(){
+        bool leftLineFound=false;
+            bool rightLineFound=false;
+
+            int leftLine=0;
+            int rightLine=0;
+            signed int center=0;
+
+            std::string s;
+            for (int i = 0; i < 128; i++)
+            {
+            s = std::to_string(cameraData[i])+",";
+
+            // std::cout << s;
+
+            // serialPC.write(&s, s.size());
+                // std::cout << std::to_string(cameraData[i]) << ", ";
+                if (cameraData[i] > 50)
+                {
+                    // std::cout << "Black Pixel found at: " << std::to_string(i) << std::endl;
+
+                    // std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+                    // 1. GET RIGHT MOST LEFT BLACK PIXEL
+                        // 1.1 
+                    if (!leftLineFound)
+                    {
+                        // std::cout << "+++++++++++++++++++++++++" << std::endl;
+
+                        leftLine = i;
+                    }
+                    // 2. GET LEFT MOST RIGHT BLACK PIXEL
+                    else {
+                        rightLine = i;
+
+                        break;
+                    }
+                    // 3. SUM VALUES AND DIVIDE BY 2
+                    
+                }
+                else {
+                    if (leftLine > 0)
+                    {
+                        leftLineFound = true;
+                    }
+                }
+            }
+
+            center = (leftLine + rightLine) / 2;
+
+            if (rightLine == 0)
+            {
+                if (leftLine > 64)
+                {
+                    center = leftLine + 64;
+                    // displacement = 100;
+                    
+                }
+                else 
+                {
+                    center = leftLine - 64;
+                    // displacement = -100;
+                }
+            }
+
+            serialPC.write((char*)",\n",2);
+            double displacement = 64-center;
+            double normalized = displacement/64;
+            // s = "normalized: ";
+            s = std::to_string(int(displacement))+"\n";
+
+            // std::cout << s;
+            // serialPC.write(&s, s.size());
+
+            // serialPC.write(&s, s.size());
+            // serialPC.write((char*)",\n",2);
+            // s = std::to_string(int(normalized*100));
+            // serialPC.write(&s, s.size());
+            std::cout << "leftline: " << leftLine << std::endl;
+            std::cout << "rightline: " << rightLine << std::endl;
+            std::cout << "center: " << center << std::endl;
+
+            Servo::steer(int(normalized*100));
+            // serialPC.write((char*)",\n",2);
+
+            // std::cout << s;
+
+            // std::cout << "ste: " << std::to_string(int(normalized*100)) << std::endl;
+            // wait_us(100);
     }
 
 }

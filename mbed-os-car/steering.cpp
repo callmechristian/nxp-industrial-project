@@ -72,11 +72,13 @@ namespace Camera {
             double displacement = 64-center;
             double normalized = displacement/64;
 
+            std::cout << normalized << std::endl;
+
             // should be 6
-            std::cout << "LeftLine: " << std::to_string(leftLine) << std::endl;
-            // should be 121 or something
-            std::cout << "RightLine: " << std::to_string(rightLine) << std::endl;
-            std::cout << "Center: " << std::to_string(center)<< std::endl;
+            // std::cout << "LeftLine: " << std::to_string(leftLine) << std::endl;
+            // // should be 121 or something
+            // std::cout << "RightLine: " << std::to_string(rightLine) << std::endl;
+            // std::cout << "Center: " << std::to_string(center)<< std::endl;
             // wait_us(1000000);
         }
     // }

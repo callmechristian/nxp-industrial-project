@@ -37,16 +37,16 @@ int main()
     std::cout << "heyla\n";
     initializeRearMotors();    
     initializeServo();
-    std::cout << "pizza\n";
-    move(42);
-    wait_us(4000000);
-    steer(60);
-    wait_us(4000000);
-    move(50);
-    std::cout << "hghghg\n";
-    wait_us(4000000);
-    steer(40);
-    wait_us(4000000);
+    // std::cout << "pizza\n";
+    // move(42);
+    // wait_us(4000000);
+    // steer(60);
+    // wait_us(4000000);
+    // move(50);
+    // std::cout << "hghghg\n";
+    // wait_us(4000000);
+    // steer(40);
+    // wait_us(4000000);
 
 
     continousScan();
