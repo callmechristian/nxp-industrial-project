@@ -25,6 +25,7 @@ namespace Camera {
     // CONTINOUS SCAN
     void continousScan();
 
+    void Filipposteer();
     void steer();
 }
 

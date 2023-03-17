@@ -10,8 +10,8 @@ namespace RearMotors{
  void initializeRearMotors(){
     pwm.period(0.00004f);
     pwm.write(38);
-    std::cout << "Initializing rear escs... ";
-    wait_us(2000000);
+    std::cout << "Initializing rear escs... " << std::endl;
+    wait_us(20000000);
     std::cout << "..Done\n";
 
  }

@@ -1,6 +1,8 @@
 #include "linescan.h"
 #include "steering.h"
 #include <string>
+#include <vector>
+
 
 
 // PINS
@@ -13,8 +15,6 @@ BufferedSerial serialPC(USBTX, USBRX); // tx, rx /
 // TODO: be able to use printf instead of serial.write: https://os.mbed.com/docs/mbed-os/v6.16/apis/serial-uart-apis.html
 BufferedSerial serial(D1, D0); // tx, rx
 #include "Servo.h" 
-
-
 
 namespace Camera{
     // VARIABLES
@@ -30,11 +30,11 @@ namespace Camera{
         {
             // std::cout << "efijfpa" << std::endl;
             readAnalog();
-            // sendReading();
+            sendReading();
 
             // wait_us(1000000);
             // calculateSteer(cameraData);
-            steer();
+            Filipposteer();
         }
     }
 
@@ -73,6 +73,8 @@ namespace Camera{
         si.write(0);
         clk.write(0);
 
+
+
         // ?? delay ??
         wait_us(20);
 
@@ -97,13 +99,15 @@ namespace Camera{
         {
             std::string s = std::to_string(cameraData[i])+",";
 
-            // std::cout << s;
-            serial.write(&s, s.size());
-            serialPC.write(&s, s.size());
+            std::cout << s;
+            //serial.write(&s, s.size());
+            //serialPC.write(&s, s.size());
         }
+
+        std::cout << std::endl;
         // std::cout << "," << std::endl;
-        serial.write((char*)",\n",2);
-        serialPC.write((char*)",\n",2);
+        //serial.write((char*)",\n",2);
+        //serialPC.write((char*)",\n",2);
         // serial.write((int*) foo, 4*128);
     }
 
@@ -124,94 +128,125 @@ namespace Camera{
         std::cout << "\n";
     }
 
+    void Filipposteer(){
+        
+        int THRESHOLD = 50;
+        int leftLine=0;
+        int rightLine=0;
+        std::vector<int> over;
+
+        for (int i = 0; i < 128; i++)
+        {
+            if (cameraData[i] > THRESHOLD){
+                over.push_back(i);
+            }
+        }
+
+        int sumL = 0;
+        int countL = 0;
+        int sumR = 0;
+        int countR = 0;
+        for (auto el : over){
+            if (el<64){
+                sumL+=el;
+                countL++;
+            }else{
+                sumR+=el;
+                countR++;
+            }
+        }
+        leftLine = sumL/countL;
+        rightLine = sumR/countR;
+        std::cout << "L: " << std::to_string(leftLine) << "\tR: " << std::to_string(rightLine) << std::endl;
+
+
+    }
+
     void steer(){
         bool leftLineFound=false;
-            bool rightLineFound=false;
+        bool rightLineFound=false;
 
-            int leftLine=0;
-            int rightLine=0;
-            signed int center=0;
-
-            std::string s;
-            for (int i = 0; i < 128; i++)
-            {
+        int leftLine=0;
+        int rightLine=0;
+        signed int center=0;
+        sendReading();
+        std::string s;
+        for (int i = 0; i < 128; i++)
+        {
             s = std::to_string(cameraData[i])+",";
 
-            // std::cout << s;
-
-            // serialPC.write(&s, s.size());
-                // std::cout << std::to_string(cameraData[i]) << ", ";
-                if (cameraData[i] > 50)
-                {
-                    // std::cout << "Black Pixel found at: " << std::to_string(i) << std::endl;
-
-                    // std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
-                    // 1. GET RIGHT MOST LEFT BLACK PIXEL
-                        // 1.1 
-                    if (!leftLineFound)
-                    {
-                        // std::cout << "+++++++++++++++++++++++++" << std::endl;
-
-                        leftLine = i;
-                    }
-                    // 2. GET LEFT MOST RIGHT BLACK PIXEL
-                    else {
-                        rightLine = i;
-
-                        break;
-                    }
-                    // 3. SUM VALUES AND DIVIDE BY 2
-                    
-                }
-                else {
-                    if (leftLine > 0)
-                    {
-                        leftLineFound = true;
-                    }
-                }
-            }
-
-            center = (leftLine + rightLine) / 2;
-
-            if (rightLine == 0)
+            // std::cout << std::to_string(cameraData[i]) << ", ";
+            if (cameraData[i] > 50)
             {
-                if (leftLine > 64)
+                // std::cout << "Black Pixel found at: " << std::to_string(i) << std::endl;
+
+                // std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+                // 1. GET RIGHT MOST LEFT BLACK PIXEL
+                    // 1.1 
+                if (!leftLineFound)
                 {
-                    center = leftLine + 64;
-                    // displacement = 100;
-                    
+                    // std::cout << "+++++++++++++++++++++++++" << std::endl;
+
+                    leftLine = i;
                 }
-                else 
+                // 2. GET LEFT MOST RIGHT BLACK PIXEL
+                else {
+                    rightLine = i;
+
+                    break;
+                }
+                // 3. SUM VALUES AND DIVIDE BY 2
+                
+            }
+            else {
+                if (leftLine > 0)
                 {
-                    center = leftLine - 64;
-                    // displacement = -100;
+                    leftLineFound = true;
                 }
             }
+        }
 
-            serialPC.write((char*)",\n",2);
-            double displacement = 64-center;
-            double normalized = displacement/64;
-            // s = "normalized: ";
-            s = std::to_string(int(displacement))+"\n";
+        center = (leftLine + rightLine) / 2;
 
-            // std::cout << s;
-            // serialPC.write(&s, s.size());
+        if (rightLine == 0)
+        {
+            if (leftLine > 64)
+            {
+                center = leftLine + 64;
+                // displacement = 100;
+                
+            }
+            else 
+            {
+                center = leftLine - 64;
+                // displacement = -100;
+            }
+        }
 
-            // serialPC.write(&s, s.size());
-            // serialPC.write((char*)",\n",2);
-            // s = std::to_string(int(normalized*100));
-            // serialPC.write(&s, s.size());
-            std::cout << "leftline: " << leftLine << std::endl;
-            std::cout << "rightline: " << rightLine << std::endl;
-            std::cout << "center: " << center << std::endl;
+        serialPC.write((char*)",\n",2);
+        double displacement = 64-center;
+        double normalized = displacement/64;
+        // s = "normalized: ";
+        s = std::to_string(int(displacement))+"\n";
 
-            Servo::steer(int(normalized*100));
-            // serialPC.write((char*)",\n",2);
+        // std::cout << s;
+        // serialPC.write(&s, s.size());
 
-            // std::cout << s;
+        // serialPC.write(&s, s.size());
+        // serialPC.write((char*)",\n",2);
+        // s = std::to_string(int(normalized*100));
+        // serialPC.write(&s, s.size());
+        std::cout << "leftline: " << leftLine << std::endl;
+        std::cout << "rightline: " << rightLine << std::endl;
+        std::cout << "center: " << center << std::endl;
 
-            // std::cout << "ste: " << std::to_string(int(normalized*100)) << std::endl;
-            // wait_us(100);
+        //Servo::steer(int(normalized*100));
+        // serialPC.write((char*)",\n",2);
+
+        // std::cout << s;
+
+        // std::cout << "ste: " << std::to_string(int(normalized*100)) << std::endl;
+        // wait_us(100);
     }
 
 }
