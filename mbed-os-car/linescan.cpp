@@ -34,7 +34,7 @@ namespace Camera{
 
             // wait_us(1000000);
             // calculateSteer(cameraData);
-            Filipposteer();
+            //Filipposteer();
         }
     }
 
@@ -99,15 +99,15 @@ namespace Camera{
         {
             std::string s = std::to_string(cameraData[i])+",";
 
-            std::cout << s;
-            //serial.write(&s, s.size());
-            //serialPC.write(&s, s.size());
+            //std::cout << s;
+            serial.write(&s, s.size());
+            serialPC.write(&s, s.size());
         }
 
-        std::cout << std::endl;
+        //std::cout << std::endl;
         // std::cout << "," << std::endl;
-        //serial.write((char*)",\n",2);
-        //serialPC.write((char*)",\n",2);
+        serial.write((char*)",\n",2);
+        serialPC.write((char*)",\n",2);
         // serial.write((int*) foo, 4*128);
     }
 
@@ -155,9 +155,13 @@ namespace Camera{
                 countR++;
             }
         }
+        
+
         leftLine = sumL/countL;
         rightLine = sumR/countR;
-        std::cout << "L: " << std::to_string(leftLine) << "\tR: " << std::to_string(rightLine) << std::endl;
+
+        int center = (leftLine + rightLine) / 2;
+        std::cout << "L: " << std::to_string(leftLine) << "\tR: " << std::to_string(rightLine) << "\tC: " << std::to_string(rightLine) << std::endl;
 
 
     }

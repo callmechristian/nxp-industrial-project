@@ -18,7 +18,7 @@ namespace RearMotors{
 
  void move(int speed){ //speed between 0 and 100
 
-    //need to map!!
+    //need to map!! 42 - 56
     float tmp = speed;
     tmp = tmp/100;
     pwm.write(tmp);
