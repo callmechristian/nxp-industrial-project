@@ -16,7 +16,10 @@ DigitalOut si(D10);
 AnalogIn analogIn(A0);
 PwmOut pwm(D4);
 
-Servo new_servo(D3);
+// Servo new_servo(D3);
+
+Servo steer_servo(D3);
+
 
 // tx, rx /
 
@@ -51,7 +54,7 @@ namespace Camera{
         // thread.start(callback(Servo::steer, angle_));
         angle_ = 50;
         
-        // thread.start(steer_thread);
+        thread.start(steer_thread);
         thread2.start(move_thread);
 
         // thread.start(led2_thread);
@@ -245,8 +248,6 @@ namespace Camera{
         RearMotors::initializeRearMotors();
 
         RearMotors::move(52);
-        new_servo.calibrate(1);
-        new_servo = 0.6;
         
         ThisThread::sleep_for(10s);
         // while(true)
@@ -259,25 +260,51 @@ namespace Camera{
     void steer_thread(){
         // pwm.write(10);
         // pwm.period(0.00004f);
-        pwm.period(0.020f);
+        // pwm.period(0.020f);
 
-        // pwm.write(10);
-        std::cout << "before init" << std::endl;
+        // // pwm.write(10);
+        // std::cout << "before init" << std::endl;
     
-        ThisThread::sleep_for(5s);
-        pwm.write(0.38);
-        ThisThread::sleep_for(100ms);
-        pwm.write(0.42);
+        // ThisThread::sleep_for(5s);
+        // pwm.write(0.38);
+        // ThisThread::sleep_for(100ms);
+        // pwm.write(0.42);
 
-        while(true){
-            // std::cout << "steer and move" << std::endl;
+        // while(true){
+        //     // std::cout << "steer and move" << std::endl;
 
-            // RearMotors::move(43);
-            // ThisThread::sleep_for(100ms);
+        //     // RearMotors::move(43);
+        //     // ThisThread::sleep_for(100ms);
 
-            // Servo::steer(angle_);
+        //     // Servo::steer(angle_);
+        //     ThisThread::sleep_for(10ms);
+        // }
+
+
+        ThisThread::sleep_for(3s);
+
+
+        std::cout<<"Calibrating..."<<std::endl;
+        steer_servo.calibrate();
+
+        std::cout<<"Done."<<std::endl;
+
+        std::cout<<"Steering to 0.3"<<std::endl;
+        steer_servo = 0.3;
+        while(1) {
+            // std::cout<<"Steering to " << std::to_string(int(angle_)) <<std::endl;
+            steer_servo = angle_/100.;
             ThisThread::sleep_for(10ms);
+            // for(int i=0; i<100; i++) {
+            //  steer_servo = i/100.0;
+            //     ThisThread::sleep_for(10ms);
+            // }
+            // for(int i=100; i>0; i--) {
+            //     steer_servo = i/100.0;
+            //     ThisThread::sleep_for(10ms);
+            // }
         }
+        
     }
 
     void steer(){

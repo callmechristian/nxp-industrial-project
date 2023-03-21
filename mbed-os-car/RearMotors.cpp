@@ -47,10 +47,9 @@ namespace RearMotors{
     //sends longest and shortest PWM pulse to learn and arm at power on
     rear_motor = 1.0; //send longest PWM
     // ledf = ledr = 0;
-
+    ThisThread::sleep_for(500ms);
     rear_motor = 0.47;
     ThisThread::sleep_for(500ms);
-
 
 
     //ESC now operational using standard servo PWM signals
