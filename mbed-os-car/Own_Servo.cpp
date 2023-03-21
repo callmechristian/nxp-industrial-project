@@ -1,13 +1,13 @@
 
-#include "Servo.h"
+#include "Own_Servo.h"
 #include "PwmOut.h"
 #include "mbed.h"
 #include <iostream>
 
-mbed::PwmOut servo(D4);
+mbed::PwmOut servo(D3);
 
 
-namespace Servo{
+namespace Own_Servo{
  void initializeServo(){
 
     std::cout << "Initializing servos... ";
@@ -18,8 +18,10 @@ namespace Servo{
  void steer(int angle){ //angle between 0 and 100
 
     float tmp = angle;
+    // float tmp = 80;
     tmp = tmp/100;
 
+    
     servo.pulsewidth(0.001f + 0.001f * tmp);
  }
 

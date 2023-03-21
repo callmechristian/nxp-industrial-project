@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include "Own_Servo.h"
+#include "RearMotors.h"
+#include "Servo/Servo.h"
 
 
 // PINS
@@ -11,21 +14,29 @@ DigitalOut led1(LED1);
 DigitalOut clk(D13);
 DigitalOut si(D10);
 AnalogIn analogIn(A0);
-BufferedSerial serialPC(USBTX, USBRX); // tx, rx /
+PwmOut pwm(D4);
+
+Servo new_servo(D3);
+
+// tx, rx /
 
 // TODO: be able to use printf instead of serial.write: https://os.mbed.com/docs/mbed-os/v6.16/apis/serial-uart-apis.html
 BufferedSerial serial(D1, D0); // tx, rx
-#include "Servo.h" 
 
 Thread thread;
 
+Thread thread2;
+
+
 
 namespace Camera{
+    BufferedSerial serialPC(USBTX, USBRX); 
     // VARIABLES
     int cameraData[128];  
     int cameraData_copy[128];  
     int sensorValue;
     Mutex m;
+    int angle_;
     // std::map<std::string, std::string> g_pages;
     // std::mutex g_pages_mutex;
     // CONTINOUS SCAN
@@ -33,8 +44,15 @@ namespace Camera{
     {
         initialize();
 
+        // Servo::initializeServo();
+
         serial.set_baud(115200);
         serialPC.set_baud(115200);
+        // thread.start(callback(Servo::steer, angle_));
+        angle_ = 50;
+        
+        // thread.start(steer_thread);
+        thread2.start(move_thread);
 
         // thread.start(led2_thread);
         // thread.start(sendReading);
@@ -44,7 +62,7 @@ namespace Camera{
             // std::cout << "efijfpa" << std::endl;
             readAnalog();
 
-            // sendReading();
+            sendReading();
             // wait_us(10000000);
             // ThisThread::sleep_for(1s);
             // calculateSteer(cameraData);
@@ -124,13 +142,13 @@ namespace Camera{
 
                 //std::cout << s;
                 serial.write(&s, s.size());
-                serialPC.write(&s, s.size());
+                // serialPC.write(&s, s.size());
             }
 
             //std::cout << std::endl;
             // std::cout << "," << std::endl;
             serial.write((char*)",\n",2);
-            serialPC.write((char*)",\n",2);
+            // serialPC.write((char*)",\n",2);
             // serial.write((int*) foo, 4*128);
             // ThisThread::sleep_for(1000ms);
         //     m.unlock();
@@ -188,12 +206,78 @@ namespace Camera{
         rightLine = sumR/countR;
 
         int center = (leftLine + rightLine) / 2;
-        std::string s = std::to_string(center)+"\n"+std::to_string(leftLine)+"\n"+std::to_string(rightLine)+"\n";
-        serialPC.write(&s, s.size());
-        serial.write(&s, s.size());
+        // serial.write(&s, s.size());
+        int displacement = -4*(64 - center);
+        // angle_ = int((double(64+displacement)/128.0)*150);
+        angle_ = 50+displacement;
+        
+        std::string s = std::to_string(center)+"\t"+ std::to_string(angle_)+"\n";
+        // serialPC.write(&s, s.size());
+
+        // initializeServo();
         // std::cout << "L: " << std::to_string(leftLine) << "\tR: " << std::to_string(rightLine) << "\tC: " << std::to_string(rightLine) << std::endl;
 
 
+    }
+     void move(int speed){ //speed between 42 and 56
+        //need to map!! 42 - 56
+        float tmp = speed;
+        tmp = tmp/100;
+        pwm.write(tmp);
+    } 
+
+    void move_thread(){
+        // pwm.period(0.00004f);
+        // // pwm.write(10);
+        // std::cout << "before init" << std::endl;
+    
+        // ThisThread::sleep_for(5s);
+        // pwm.write(0.38);
+
+        // std::cout << "before init" << std::endl;
+
+        // ThisThread::sleep_for(100ms);
+        // pwm.write(0.42);
+        // while(true)
+        // {
+        // }
+
+        RearMotors::initializeRearMotors();
+
+        RearMotors::move(52);
+        new_servo.calibrate(1);
+        new_servo = 0.6;
+        
+        ThisThread::sleep_for(10s);
+        // while(true)
+        // {
+
+        // }
+        
+    }
+
+    void steer_thread(){
+        // pwm.write(10);
+        // pwm.period(0.00004f);
+        pwm.period(0.020f);
+
+        // pwm.write(10);
+        std::cout << "before init" << std::endl;
+    
+        ThisThread::sleep_for(5s);
+        pwm.write(0.38);
+        ThisThread::sleep_for(100ms);
+        pwm.write(0.42);
+
+        while(true){
+            // std::cout << "steer and move" << std::endl;
+
+            // RearMotors::move(43);
+            // ThisThread::sleep_for(100ms);
+
+            // Servo::steer(angle_);
+            ThisThread::sleep_for(10ms);
+        }
     }
 
     void steer(){
@@ -203,7 +287,7 @@ namespace Camera{
         int leftLine=0;
         int rightLine=0;
         signed int center=0;
-        sendReading();
+        // sendReading();
         std::string s;
         for (int i = 0; i < 128; i++)
         {

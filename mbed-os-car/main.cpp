@@ -20,13 +20,19 @@
 // Blinking rate in milliseconds
 #define BLINKING_RATE     500ms
 //Thread steeringThread;
-#include "Servo.h"
+// #include "Own_Servo.h"
 #include "RearMotors.h"
 
-using namespace Servo;
+// using namespace Servo;
 using namespace RearMotors;
 
 using namespace Camera;
+
+
+
+
+
+
 // using namespace M;
 int main()
 {
@@ -36,10 +42,8 @@ int main()
     // calculateSteer();
 /*
     std::cout << "heyla\n";
-    initializeRearMotors();    
     initializeServo();
     std::cout << "pizza\n";
-    move(42);
     wait_us(4000000);
     steer(60);
     wait_us(4000000);
@@ -49,7 +53,9 @@ int main()
     steer(40);
     wait_us(4000000);
 */
-
+    // initializeRearMotors();    
+    // initializeServo();
+    // move(42);
     continousScan();
 }
  

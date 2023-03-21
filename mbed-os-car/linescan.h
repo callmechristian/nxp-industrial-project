@@ -25,6 +25,10 @@ namespace Camera {
     // CONTINOUS SCAN
     void continousScan();
 
+    void steer_thread();
+
+    void move_thread();
+
     void Filipposteer();
     void steer();
 }
