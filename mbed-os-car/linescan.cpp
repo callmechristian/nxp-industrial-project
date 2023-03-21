@@ -1,8 +1,9 @@
 #include "linescan.h"
+#include "ThisThread.h"
 #include "steering.h"
 #include <string>
 #include <vector>
-
+#include <mutex>
 
 
 // PINS
@@ -16,25 +17,38 @@ BufferedSerial serialPC(USBTX, USBRX); // tx, rx /
 BufferedSerial serial(D1, D0); // tx, rx
 #include "Servo.h" 
 
+Thread thread;
+
+
 namespace Camera{
     // VARIABLES
     int cameraData[128];  
+    int cameraData_copy[128];  
     int sensorValue;
-
+    Mutex m;
+    // std::map<std::string, std::string> g_pages;
+    // std::mutex g_pages_mutex;
     // CONTINOUS SCAN
     void continousScan()
     {
         initialize();
 
+        serial.set_baud(115200);
+        serialPC.set_baud(115200);
+
+        // thread.start(led2_thread);
+        // thread.start(sendReading);
+
         while(1)
         {
             // std::cout << "efijfpa" << std::endl;
             readAnalog();
-            sendReading();
 
-            // wait_us(1000000);
+            // sendReading();
+            // wait_us(10000000);
+            // ThisThread::sleep_for(1s);
             // calculateSteer(cameraData);
-            //Filipposteer();
+            Filipposteer();
         }
     }
 
@@ -67,6 +81,9 @@ namespace Camera{
 
     void readAnalog()
     {
+        // std::cout << std::endl;
+        // serial.write((char*)",\n",2);
+        // serialPC.write((char*)",\n",2);
         // Start integration cycle by sending SI pulse
         si.write(1);
         clk.write(1);
@@ -89,26 +106,36 @@ namespace Camera{
         }
 
         // wait_us(25000);
-        wait_us(25);
+        std::copy(std::begin(cameraData), std::end(cameraData), std::begin(cameraData_copy));
+        wait_us(25000);
+
+        // wait_us(10000000);
     }
 
     void sendReading()
     {
-        int foo[128];
-        for (int i = 0; i < 128; i++)
-        {
-            std::string s = std::to_string(cameraData[i])+",";
+        // while(true)
+        // {
+        //     m.lock();
+            int foo[128];
+            for (int i = 0; i < 128; i++)
+            {
+                std::string s = std::to_string(cameraData_copy[i])+",";
 
-            //std::cout << s;
-            serial.write(&s, s.size());
-            serialPC.write(&s, s.size());
-        }
+                //std::cout << s;
+                serial.write(&s, s.size());
+                serialPC.write(&s, s.size());
+            }
 
-        //std::cout << std::endl;
-        // std::cout << "," << std::endl;
-        serial.write((char*)",\n",2);
-        serialPC.write((char*)",\n",2);
-        // serial.write((int*) foo, 4*128);
+            //std::cout << std::endl;
+            // std::cout << "," << std::endl;
+            serial.write((char*)",\n",2);
+            serialPC.write((char*)",\n",2);
+            // serial.write((int*) foo, 4*128);
+            // ThisThread::sleep_for(1000ms);
+        //     m.unlock();
+        // }
+        
     }
 
 
@@ -161,7 +188,10 @@ namespace Camera{
         rightLine = sumR/countR;
 
         int center = (leftLine + rightLine) / 2;
-        std::cout << "L: " << std::to_string(leftLine) << "\tR: " << std::to_string(rightLine) << "\tC: " << std::to_string(rightLine) << std::endl;
+        std::string s = std::to_string(center)+"\n"+std::to_string(leftLine)+"\n"+std::to_string(rightLine)+"\n";
+        serialPC.write(&s, s.size());
+        serial.write(&s, s.size());
+        // std::cout << "L: " << std::to_string(leftLine) << "\tR: " << std::to_string(rightLine) << "\tC: " << std::to_string(rightLine) << std::endl;
 
 
     }
