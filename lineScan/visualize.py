@@ -4,14 +4,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
 
-arduino = serial.Serial(port = 'COM6', baudrate=115200, timeout=0.1)
+arduino = serial.Serial(port = '/dev/cu.usbmodem102', baudrate=115200, 
+timeout=0.1)
 
 nx = 5
 ny = 128
 
 fig = plt.figure()
 data = np.zeros((nx, ny))
-im = plt.imshow(data, cmap='gist_gray_r', vmin=0, vmax=500)
+im = plt.imshow(data, cmap='gist_gray_r', vmin=0, vmax=4095)
 image = np.random.rand(1, 128)
 
 
