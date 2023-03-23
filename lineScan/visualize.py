@@ -12,7 +12,7 @@ ny = 128
 
 fig = plt.figure()
 data = np.zeros((nx, ny))
-im = plt.imshow(data, cmap='gist_gray_r', vmin=0, vmax=500)
+im = plt.imshow(data, cmap='gist_gray_r', vmin=0, vmax=4095)
 image = np.random.rand(1, 128)
 
 

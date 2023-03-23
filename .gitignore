@@ -35,3 +35,10 @@
 
 
 
+# *
+/*
+/*/
+!*/.gitignore
+!/mbed-os-car/
+# !*.cpp
+# !*/*.h
