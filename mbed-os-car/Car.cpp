@@ -30,10 +30,10 @@ namespace Car {
     AnalogIn analogIn(A0);
 
     // Rear Motors
-    PwmOut motor(D4);
+    Servo motor(D8);
 
     // Servo
-    Servo servo(D3);
+    Servo servo(D9);
 
     // Serial communication
     BufferedSerial serialPC(USBTX, USBRX); 
@@ -61,6 +61,8 @@ namespace Car {
         Steer::initializeServo();
         // Initialize camera
         Camera::initialize();
+
+        ThisThread::sleep_for(1s);
         
         // start the threads
         steerThread.start(Steer::steerLoop);

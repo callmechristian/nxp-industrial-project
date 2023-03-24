@@ -20,14 +20,14 @@ void initializeRearMotors() {
 
   motor = 0.0;
   // ledf = ledr = 1;
-  ThisThread::sleep_for(500ms); // ESC detects signal
+  ThisThread::sleep_for(1s); // ESC detects signal
   // Required ESC Calibration/Arming sequence
   // sends longest and shortest PWM pulse to learn and arm at power on
   motor = 1.0; // send longest PWM
   // ledf = ledr = 0;
-  ThisThread::sleep_for(500ms);
-  motor = 0.47;
-  ThisThread::sleep_for(500ms);
+  ThisThread::sleep_for(1s);
+  motor = 0.46;
+  ThisThread::sleep_for(1s);
 
 
   std::cout << "..Done\n";
