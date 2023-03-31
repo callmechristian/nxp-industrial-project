@@ -31,14 +31,18 @@
 *.exe
 *.out
 *.app
+
+# Matlab cache
+*.slxc
+/control-design/slprj
 # -----------------------------------------------------------
 
-
-
-# *
 /*
 /*/
 !*/.gitignore
 !/mbed-os-car/
+!/control-design/
+!/debug/
+!/esp/
 # !*.cpp
 # !*/*.h

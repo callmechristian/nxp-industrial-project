@@ -9,10 +9,8 @@
 // #include "Controller.h"
 
 namespace Steer{
-    double steeringAngle = 50.0;
-    double prev_err = 0.0;
-    double Kd = 0.1;
-    double Kp = 3.0;
+    double steeringAngle = 0.5; // assume steering is in neutral
+    double prev_center = 64.0; // assume car is placed in the center of the track
 
     void initializeServo(){
         ThisThread::sleep_for(3s);
@@ -33,7 +31,7 @@ namespace Steer{
 
         int THRESHOLD = 50;
         int leftLine=0;
-        int rightLine=0;
+        int rightLine=128;
         int leftLine_consecutive = 0;
         int rightLine_consecutive = 0;
         int leftLine_consecutive_threshold = 2;
@@ -41,13 +39,14 @@ namespace Steer{
 
         std::vector<int> over;
 
-        // TODO: for robustness, make sure at least 3 consecutive pixels are over the threshold?
         // find right line
         for (int i = 64; i < 128; i++)
         {
             if (Camera::cameraData[i] > THRESHOLD){
                 rightLine = i;
                 rightLine_consecutive++;
+            } else {
+                rightLine_consecutive = 0;
             }
             if (rightLine_consecutive >= rightLine_consecutive_threshold) {
                 break;
@@ -60,39 +59,29 @@ namespace Steer{
             if (Camera::cameraData[i] > THRESHOLD){
                 leftLine = i;
                 leftLine_consecutive++;
+            } else {
+                leftLine_consecutive = 0;
             }
             if (rightLine_consecutive >= rightLine_consecutive_threshold) {
                 break;
             }
         }
 
-        // set left line to max if it is not recognized
-        if (leftLine == 0) {
-            leftLine = 64;
-        }
+        // compute center as the mean between the two pixel positions of the lines
+        double center = (leftLine + rightLine) / 2.0;  
 
-        // set right line to max if it is not recognized
-        if (rightLine == 0) {
-            rightLine = 64;
-        }
-
-        double center = (leftLine + rightLine) / 2.0;
-
-        double displacement = (center - 64);
-
-        double error_deriv = displacement - prev_err;
-
-        // steeringAngle = 50 + Kp * displacement + Kd * error_deriv;
-        steeringAngle = 50 + Kp * displacement;
+        // update previous center with current 
+        prev_center = center;     
         
-        std::string s = std::to_string(center)+"\t"+ std::to_string(steeringAngle)+"\n";
+        // // uncomment for debug
+        // std::string s = std::to_string(center)+"\t"+ std::to_string(steeringAngle)+"\n";
         // std::cout<< s<< std::endl;
     }
 
     void steerLoop(){
         while(1) {
             calculateSteer();
-            Car::servo = steeringAngle/100.;
+            Car::servo = steeringAngle;
             ThisThread::sleep_for(10ms);
         }
     }
