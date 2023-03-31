@@ -18,15 +18,18 @@ void initializeRearMotors() {
 
   std::cout << "Initializing rear escs... " << std::endl;
 
-  motor = 0.0;
+  motor_r = 0.0;
+  motor_l = 0.0;
   // ledf = ledr = 1;
   ThisThread::sleep_for(1s); // ESC detects signal
   // Required ESC Calibration/Arming sequence
   // sends longest and shortest PWM pulse to learn and arm at power on
-  motor = 1.0; // send longest PWM
+  motor_r = 1.0; // send longest PWM
+  motor_l = 1.0; // send longest PWM
   // ledf = ledr = 0;
   ThisThread::sleep_for(1s);
-  motor = 0.46;
+  motor_r = 0.46;
+  motor_l = 0.46;
   ThisThread::sleep_for(1s);
 
 
@@ -38,11 +41,12 @@ void initializeRearMotors() {
 void move(int speed) { // speed between 0 and 100
   // TODO: map from 50 to 90 or something for forward
   //       and from 46 to 10 (maybe) for backward
-  motor = speed / 100.;
+  motor_r = speed / 100.;
+  motor_l = speed / 100.;
 }
 
 void motorLoop(){
-    move(52);
+    move(46);
 
     while(1)
     {

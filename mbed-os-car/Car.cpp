@@ -30,10 +30,11 @@ namespace Car {
     AnalogIn analogIn(A0);
 
     // Rear Motors
-    Servo motor(D8);
+    Servo motor_l(D4);
+    Servo motor_r(D5);
 
     // Servo
-    Servo servo(D9);
+    Servo servo(D3);
 
     // Serial communication
     BufferedSerial serialPC(USBTX, USBRX); 

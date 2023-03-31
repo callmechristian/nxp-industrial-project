@@ -81,10 +81,10 @@ namespace Camera{
         {
             std::string s = std::to_string(cameraData[i])+",";
             
-            serial.write(&s, s.size());
+            serialPC.write(&s, s.size());
             
         }
-        serial.write((char*)",\n",2);
+        serialPC.write((char*)",\n",2);
     }
     
 

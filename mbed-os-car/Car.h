@@ -19,7 +19,8 @@ namespace Car {
     extern AnalogIn analogIn;
 
     // Rear Motors
-    extern Servo motor;
+    extern Servo motor_r;
+    extern Servo motor_l;
 
     // Servo
     extern Servo servo;
