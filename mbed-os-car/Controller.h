@@ -1,4 +1,4 @@
 namespace Controller {
-    double Kp = -4;
-    double Ki = 0;
+    double angle_from_center_P(double center, double Kp);
+    double angle_from_center_PD(double center, double prev_center, double Kp, double Kd, double sampling_time);
 }

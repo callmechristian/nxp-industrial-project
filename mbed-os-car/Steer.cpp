@@ -70,8 +70,13 @@ namespace Steer{
         // compute center as the mean between the two pixel positions of the lines
         double center = (leftLine + rightLine) / 2.0;  
 
+        // PD CONTROLLER
+        double Kp = 0.2;
+        double Kd = 0.1;
+        steeringAngle = angle_from_center_PD(center, prev_center, Kp, Kd, 0.01);
+
         // update previous center with current 
-        prev_center = center;     
+        prev_center = center;
         
         // // uncomment for debug
         // std::string s = std::to_string(center)+"\t"+ std::to_string(steeringAngle)+"\n";
