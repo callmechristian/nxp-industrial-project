@@ -1,4 +1,5 @@
 #include "Steer.h"
+#include <utility>
 #include <vector>
 #include "Camera.h"
 #include <iostream>
@@ -6,11 +7,20 @@
 
 #include "ThisThread.h"
 #include "Car.h"
-// #include "Controller.h"
+#include "Controller.h"
+#include "RearMotors.h"
 
 namespace Steer{
     double steeringAngle = 0.5; // assume steering is in neutral
+    double prevSteeringAngle = 0.5; // assume initial position is neutral
     double prev_center = 64.0; // assume car is placed in the center of the track
+    double angle_error_int = 0; // assume 0 initial condition for integrator
+    double angle_error_prev = 0; // assume no angle error in initial condition
+    double angle_output_prev = 0; // assume car started with no initial speed
+
+    // pointers to where we assign the motor speeds
+    double* wheel_l_speed_ptr = &RearMotors::wheel_l_speed;
+    double* wheel_r_speed_ptr = &RearMotors::wheel_r_speed;
 
     void initializeServo(){
         ThisThread::sleep_for(3s);
@@ -70,13 +80,20 @@ namespace Steer{
         // compute center as the mean between the two pixel positions of the lines
         double center = (leftLine + rightLine) / 2.0;  
 
-        // PD CONTROLLER
-        double Kp = 0.2;
-        double Kd = 0.1;
-        steeringAngle = angle_from_center_PD(center, prev_center, Kp, Kd, 0.01);
+        // PD CONTROLLER for wheel angle
+        steeringAngle = Controller::angle_from_center_PD(center, prev_center, 0.01);
+
+        // PID CONTROLLER for individual wheel speed
+        std::pair<double, double> p = Controller::wheel_speed_controller_PID(steeringAngle, prevSteeringAngle, angle_error_int, angle_error_prev, angle_output_prev, Controller::sampling_time);
+        *wheel_l_speed_ptr = p.first;
+        *wheel_r_speed_ptr = p.second;
+
+        
 
         // update previous center with current 
         prev_center = center;
+        // update previous angle with current steering angle
+        prevSteeringAngle = steeringAngle;
         
         // // uncomment for debug
         // std::string s = std::to_string(center)+"\t"+ std::to_string(steeringAngle)+"\n";
@@ -87,7 +104,7 @@ namespace Steer{
         while(1) {
             calculateSteer();
             Car::servo = steeringAngle;
-            ThisThread::sleep_for(10ms);
+            ThisThread::sleep_for(10ms); // WARNING!!! update sampling time in Controller.h accordingly!!!
         }
     }
 }

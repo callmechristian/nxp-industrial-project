@@ -14,6 +14,9 @@
 using namespace Car;
 
 namespace RearMotors {
+    double wheel_l_speed = 0;
+    double wheel_r_speed = 0;
+
 void initializeRearMotors() {
 
   std::cout << "Initializing rear escs... " << std::endl;
@@ -36,21 +39,40 @@ void initializeRearMotors() {
   std::cout << "..Done\n";
 }
 
-// TODO: Map from -100 to +100 or from 0 to 100 but map it to only forward speed
-// which is 0.46/0.47 to 1.0
-void move(int speed) { // speed between 0 and 100
-  // TODO: map from 50 to 90 or something for forward
-  //       and from 46 to 10 (maybe) for backward
-  motor_r = speed / 100.;
-  motor_l = speed / 100.;
+// set left wheel speed with -1 being full speed backwards and 1 being full speed forward, 0 being no movement
+void setLeftWheelSpeed(double speed) {
+  if(speed >= 0) {
+    motor_l = 0.46 + 0.54 * speed;
+  } else {
+    motor_l = 0.46 + 0.46 * speed;
+  }
+}
+
+// set right wheel speed with -1 being full speed backwards and 1 being full speed forward, 0 being no movement
+void setRightWheelSpeed(double speed) {
+  if(speed >= 0) {
+    motor_r = 0.46 + 0.54 * speed;
+  } else {
+    motor_r = 0.46 + 0.46 * speed;
+  }
+}
+
+// from -1 to 1, with 0 being no wheel speed
+void move(double speed) { // speed between -1 and 1
+  setLeftWheelSpeed(speed);
+  setRightWheelSpeed(speed);
 }
 
 void motorLoop(){
-    move(46);
+    // init as no speed
+    move(0);
 
+    // continous update
     while(1)
     {
-        // do nothing for now
+        // set speed to pointer values
+        setLeftWheelSpeed(wheel_l_speed);
+        setRightWheelSpeed(wheel_r_speed);
     }
 }
 
