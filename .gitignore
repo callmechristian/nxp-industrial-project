@@ -35,6 +35,9 @@
 # Matlab cache
 *.slxc
 /control-design/slprj
+
+# Py cache
+/debug/__pycache__
 # -----------------------------------------------------------
 
 /*
