@@ -1,0 +1,47 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1680281066",
+        "python_version": "3.8.16 (default, Dec  7 2022, 01:27:54) \n[Clang 14.0.0 (clang-1400.0.29.202)]",
+        "command_line_arguments": "lern.py",
+        "mlagents_version": "0.30.0",
+        "mlagents_envs_version": "0.30.0",
+        "communication_protocol_version": "1.5.0",
+        "pytorch_version": "1.8.0a0+71ca600",
+        "numpy_version": "1.21.2",
+        "end_time_seconds": "1680281070"
+    },
+    "total": 4.048752125,
+    "count": 1,
+    "self": 0.010835583000000426,
+    "children": {
+        "run_training.setup": {
+            "total": 0.02838800000000008,
+            "count": 1,
+            "self": 0.02838800000000008
+        },
+        "TrainerController.start_learning": {
+            "total": 4.009528542,
+            "count": 1,
+            "self": 0.0008395419999986942,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 4.008660042000001,
+                    "count": 1,
+                    "self": 4.008660042000001
+                },
+                "trainer_threads": {
+                    "total": 2.416000000060592e-06,
+                    "count": 1,
+                    "self": 2.416000000060592e-06
+                },
+                "TrainerController._save_models": {
+                    "total": 2.6542000000517874e-05,
+                    "count": 1,
+                    "self": 2.6542000000517874e-05
+                }
+            }
+        }
+    }
+}
