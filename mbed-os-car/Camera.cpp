@@ -3,24 +3,34 @@
 #include "Camera.h"
 #include "mbed.h"
 #include "Car.h"
+#include <chrono>
+#include <cstdint>
 #include <iostream>
-
-
-// Exposure rate in milliseconds
-#define EXPOSURE_TIME     25ms
+#include <vector>
 
 using namespace Car;
 
 namespace Camera{
-    int cameraData[128];  
+    // dynamic camera exposure adjustment
+    chrono::milliseconds exposureTimeStep = 1ms;
+    
+    // exposure rate in milliseconds
+    chrono::milliseconds EXPOSURE_TIME = 25ms;
+    
+    std::vector<int> cameraData(128);  
     // int steeringAngle = 50;
 
     void cameraLoop()
     {
+        calibrateCamera();
+        
         while(1)
         {
             readAnalog();
             sendReading();
+            
+            // sleep for 1ms to not hog the processor
+            ThisThread::sleep_for(1ms);
         }
     }
     
@@ -89,7 +99,18 @@ namespace Camera{
     
 
     void calibrateCamera(){
-
+        // check if white is within desired range
+        int whitePatchValue = cameraData[64];
+        if (whitePatchValue > 500)
+        {
+            // increase exposure time
+            EXPOSURE_TIME += exposureTimeStep;
+        }
+        else if (whitePatchValue < 0)
+        {
+            // decrease exposure time
+            EXPOSURE_TIME -= exposureTimeStep;
+        }
     }
 }
 

@@ -1,6 +1,8 @@
+#pragma once
+
 namespace RearMotors {
-    // extern double wheel_l_speed;
-    // extern double wheel_r_speed;
+    extern double wheel_l_speed;
+    extern double wheel_r_speed;
 
     void initializeRearMotors();
 

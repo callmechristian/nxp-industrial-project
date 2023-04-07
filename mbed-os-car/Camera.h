@@ -1,8 +1,10 @@
 #pragma once
 
+#include <vector>
+
 namespace Camera {
     // VARIABLES
-    extern int cameraData[128] ;  
+    extern std::vector<int> cameraData;  
     // extern int steeringAngle;
     
     // UTILITY FUNCTIONS

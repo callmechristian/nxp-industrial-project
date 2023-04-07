@@ -4,12 +4,12 @@
 
 
 namespace Controller {
-    double sampling_time = 0.025; // 10 milliseconds is 0.01 seconds
+    double sampling_time = 0.001; // 10 milliseconds is 0.01 seconds
 
     // P controller -- returns (type double) angle between 0 and 1
     double angle_from_center_P(double center) {
         // controller params
-        double Kp = 3; // Kp should be calculated according to track width i.e. width between the two lines
+        double Kp = -5; // Kp should be calculated according to track width i.e. width between the two lines
 
         // return value i.e. angle
         double ret_;
@@ -29,14 +29,14 @@ namespace Controller {
     // PD controller -- returns (type double) angle between 0 and 1
     double angle_from_center_PD(double center, double prev_center, double sampling_time) {
         // controller params
-        double Kp = 3;
-        double Kd = 0.8;
+        double Kp = -5;
+        double Kd = 2;
 
         // return value i.e. angle
         double ret_;
 
         // calculate the displacement from the center
-        double displacement = center - prev_center;
+        double displacement = 64 - center;
 
         // error derivative i.e. displacement derivative
         double d_displacement = (center - prev_center) / sampling_time;
@@ -54,9 +54,9 @@ namespace Controller {
     std::pair<double,double> wheel_speed_controller_PID(double angle_setpoint, double current_angle, double& angle_error_int, double& angle_error_prev, double& angle_output_prev, double sampling_time) {
         // experiment for the desired wheel-speed ratio, right now it's 0.6:1 for max steer
         // define controller params
-        double Kp = 1;
-        double Ki = 0.1;
-        double Kd = 0.9;
+        double Kp = -3;
+        double Ki = 1;
+        double Kd = 2;
         // define desire min speed an max speed
         double max_speed = 0.4; // 40% of max speed
         double min_speed = 0; // don't allow spinning the wheel backwards
@@ -78,10 +78,10 @@ namespace Controller {
         double angle_output = angle_p + angle_i + angle_d;
 
         // Apply the output to the back wheels, saturated between min_speed and max_speed
-        double left_wheel_speed = std::fmin(std::fmax(max_speed - angle_output, min_speed), max_speed);
+        double left_wheel_speed = std::fmax(std::fmin(max_speed - angle_output, max_speed), min_speed);
         double right_wheel_speed = std::fmax(std::fmin(max_speed + angle_output, max_speed), min_speed);
 
-        // Store the previous values for the derivative and integral terms
+        // Save variables for next iteration
         angle_error_prev = angle_error;
         angle_output_prev = angle_output;
 

@@ -1,3 +1,5 @@
+#pragma once
+
 // mbed libraries
 #include "InterfaceDigitalOut.h"
 #include "PinNames.h"
