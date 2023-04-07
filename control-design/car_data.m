@@ -1,5 +1,3 @@
-clear
-
 % Define parameters
 m = 1;         % mass of the car (kg)
 I = 0.1;       % moment of inertia of the car (kg*m^2)
@@ -19,3 +17,6 @@ x0 = 0;        % initial x position (m)
 phi0 = 0;      % initial orientation (rad)
 x_dot0 = 0;   % initial x velocity (m/s)
 phi_dot0 = 0;  % initial angular velocity (rad/s)
+
+% SIMULINK
+% in variables

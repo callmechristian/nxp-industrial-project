@@ -1,13 +1,15 @@
+#include <cstdio>
 #include <math.h>
 #include <utility>
 
+
 namespace Controller {
-    double sampling_time = 0.01; // 10 milliseconds is 0.01 seconds
+    double sampling_time = 0.025; // 10 milliseconds is 0.01 seconds
 
     // P controller -- returns (type double) angle between 0 and 1
     double angle_from_center_P(double center) {
         // controller params
-        double Kp = 1;
+        double Kp = 3; // Kp should be calculated according to track width i.e. width between the two lines
 
         // return value i.e. angle
         double ret_;
@@ -27,20 +29,20 @@ namespace Controller {
     // PD controller -- returns (type double) angle between 0 and 1
     double angle_from_center_PD(double center, double prev_center, double sampling_time) {
         // controller params
-        double Kp = 1;
-        double Kd = 1;
+        double Kp = 3;
+        double Kd = 0.8;
 
         // return value i.e. angle
         double ret_;
 
         // calculate the displacement from the center
-        double displacement = center - 64;
+        double displacement = center - prev_center;
 
         // error derivative i.e. displacement derivative
         double d_displacement = (center - prev_center) / sampling_time;
 
         // 64 is neutral steering i.e. 50%, then we add Kp * displacement which is simple gain (P) control
-        ret_ = 64 + Kp * displacement;
+        ret_ = 64 + Kp * displacement + Kd * d_displacement;
 
         // divide by max to get a percentage
         ret_ = ret_ / 128.0;
@@ -52,7 +54,7 @@ namespace Controller {
     std::pair<double,double> wheel_speed_controller_PID(double angle_setpoint, double current_angle, double& angle_error_int, double& angle_error_prev, double& angle_output_prev, double sampling_time) {
         // experiment for the desired wheel-speed ratio, right now it's 0.6:1 for max steer
         // define controller params
-        double Kp = 0.05;
+        double Kp = 1;
         double Ki = 0.1;
         double Kd = 0.9;
         // define desire min speed an max speed

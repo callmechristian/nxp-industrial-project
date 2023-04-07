@@ -41,20 +41,20 @@ void initializeRearMotors() {
 
 // set left wheel speed with -1 being full speed backwards and 1 being full speed forward, 0 being no movement
 void setLeftWheelSpeed(double speed) {
-  if(speed >= 0) {
+//   if(speed >= 0) {
     motor_l = 0.46 + 0.54 * speed;
-  } else {
-    motor_l = 0.46 + 0.46 * speed;
-  }
+//   } else {
+//     motor_l = 0.46 + 0.46 * speed;
+//   }
 }
 
 // set right wheel speed with -1 being full speed backwards and 1 being full speed forward, 0 being no movement
 void setRightWheelSpeed(double speed) {
-  if(speed >= 0) {
+//   if(speed >= 0) {
     motor_r = 0.46 + 0.54 * speed;
-  } else {
-    motor_r = 0.46 + 0.46 * speed;
-  }
+//   } else {
+//     motor_r = 0.46 + 0.46 * speed;
+//   }
 }
 
 // from -1 to 1, with 0 being no wheel speed
@@ -71,8 +71,10 @@ void motorLoop(){
     while(1)
     {
         // set speed to pointer values
-        setLeftWheelSpeed(wheel_l_speed);
-        setRightWheelSpeed(wheel_r_speed);
+        // setLeftWheelSpeed(0);
+        // setRightWheelSpeed(0);
+
+        ThisThread::sleep_for(40ms);
     }
 }
 
