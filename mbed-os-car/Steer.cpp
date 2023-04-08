@@ -5,17 +5,27 @@
 #include <iostream>
 #include <math.h>
 
-
+// Own headers
 #include "ThisThread.h"
 #include "Car.h"
 #include "Controller.h"
 #include "RearMotors.h"
+#include "Ultrasonic.h"
+
+// CONTROLLER SETUP -----------------------------------------------------------------------------------------------------------------------//
+#define FLAG_STEERING_CONTROLLER "P"            // currently implemented P and PD
+#define FLAG_SPEED_CONTROLLER "PID"             // currently implemented P and PID
+#define FLAG_DIFF_DRIVE_RATIO 0.9
+// PARAMS -------------------------------------------------------------------------------------------------------------------------------- //
+#define THRESHOLD_BLACK 50                      // arbitrary value // int THRESHOLD_BLACK = 50;
+#define TRACK_WIDTH 32                          // arbitrary value // int TRACK_WIDTH = 32;
+#define THRESHOLD_CHECKER_COUNT 5               // depends on how the finish flag looks like // int THRESHOLD_CHECKER_COUNT = 5;
+#define THRESHOLD_CHECKER_SIZE 3                // minimum width of each checker in the finish flag // int THRESHOLD_CHECKER_SIZE = 3;
+// CONSTANTS ----------------------------------------------------------------------------------------------------------------------------- //
+#define STEER_BIAS 0.1                          // if the servo is not working properly and has a neutral steering bias
+//---------------------------------------------------------------------------------------------------------------------------------------- //
 
 namespace Steer{
-    // PARAMS
-    int THRESHOLD_BLACK = 50; // arbitrary value
-    int TRACK_WIDTH = 32; // arbitrary value
-
     // Variables used in control
     double steeringAngle = 0.5; // assume steering is in neutral
     double prevSteeringAngle = 0.5; // assume initial position is neutral
@@ -24,21 +34,25 @@ namespace Steer{
     double angle_error_prev = 0; // assume no angle error in initial condition
     double angle_output_prev = 0; // assume car started with no initial speed
 
-    // if the servo is not working properly and has a neutral steering bias
-    double STEER_BIAS = 0.1;
-
     // pointers to where we assign the motor speeds
     double* wheel_l_speed_ptr = &RearMotors::wheel_l_speed;
     double* wheel_r_speed_ptr = &RearMotors::wheel_r_speed;
+
+    // maximum car speed
+    double max_speed_car = 0.4;
     
     // high level control
     bool foundFinishLine = false;
-    int lapsAroundTheSun = 0; // how many laps we did
+    std::vector<bool> finishLine_history;
+    int COOUNTER_LAPS_AROUND_THE_SUN = 0; // how many laps we did
 
     // serpentine detection
     std::vector<double> centerHistory; // center history vector
-    double maxDeviation; // max deviation across iterations to consider
+    double maxDeviation = 5; // max deviation across iterations to consider
     int MAX_CENTER_HISTORY = 30; // how many values of the center we keep
+
+    // misc
+    std::string _cmp_;
 
     void initializeServo(){
         ThisThread::sleep_for(3s);
@@ -65,14 +79,28 @@ namespace Steer{
         // Find center
         center = compute_center();
 
-        // PD CONTROLLER for wheel angle
-        steeringAngle = Controller::angle_from_center_PD(center, prev_center, 0.01) + STEER_BIAS;
+        _cmp_ = FLAG_STEERING_CONTROLLER;
+        if(_cmp_.compare("P")) {
+                // P CONTROLLER for wheel angle
+                steeringAngle = Controller::angle_from_center_P(center) + STEER_BIAS;
+        } else if(_cmp_.compare("PD")) {
+                // PD CONTROLLER for wheel angle
+                 steeringAngle = Controller::angle_from_center_PD(center, prev_center, 0.01) + STEER_BIAS;
+        }
 
-        // P CONTROLLER for wheel angle
-        // steeringAngle = Controller::angle_from_center_P(center);
+        // define pair
+        std::pair<double,double> p;
 
-        // PID CONTROLLER for individual wheel speed
-        std::pair<double, double> p = Controller::wheel_speed_controller_PID(steeringAngle, 0.5+(64-center)/128.0, angle_error_int, angle_error_prev, angle_output_prev, Controller::sampling_time);
+        _cmp_ = FLAG_SPEED_CONTROLLER; // comparator TODO: change later to something more efficient
+        if(_cmp_.compare("P")) {
+            // P CONTROLLER for individual wheel speed
+            p = Controller::wheel_speed_controller_P(center, max_speed_car, FLAG_DIFF_DRIVE_RATIO);
+        } else if(_cmp_.compare("PID")) {
+            // PID CONTROLLER for individual wheel speed
+            p = Controller::wheel_speed_controller_PID(steeringAngle, 0.5+(64-center)/128.0, angle_error_int, angle_error_prev, angle_output_prev, Controller::sampling_time, max_speed_car);
+        }
+
+        // set speed values
         *wheel_l_speed_ptr = p.first;
         *wheel_r_speed_ptr = p.second;
 
@@ -90,20 +118,42 @@ namespace Steer{
             centerHistory.erase(centerHistory.begin());
         }
 
-        if(isFinishFlag(Camera::cameraData, THRESHOLD_BLACK, THRESHOLD_BLACK, 5)) {
-            foundFinishLine = true;
-            lapsAroundTheSun++;
+        // update finish line history vector
+        finishLine_history.push_back(isFinishFlag(Camera::cameraData, THRESHOLD_BLACK, THRESHOLD_BLACK, 5));
+
+        // remove any values after 30
+        if(finishLine_history.size() > 30) {
+            finishLine_history.erase(finishLine_history.begin());
         }
 
-        if(lapsAroundTheSun == 0) {
+        // go through the list and decide if we found the finish line flag
+        int fline_ctr_ = 0;
+        for(bool detection : finishLine_history) {
+            if(detection) {
+                fline_ctr_++;
+            }
+        }
+        if(fline_ctr_ > THRESHOLD_CHECKER_COUNT) {
+            foundFinishLine = true;
+            COOUNTER_LAPS_AROUND_THE_SUN++;
+            finishLine_history.clear();
+        }
+
+        // High level control depending on stage
+        if(COOUNTER_LAPS_AROUND_THE_SUN == 0) {
             // steer as normal
             // check for serpentines
+            // TODO: untested
             if(isSerpentineSection(centerHistory, maxDeviation)) {
-                steeringAngle = 0.5 + STEER_BIAS;
+                // only set steering straight
+                    steeringAngle = 0.5 + STEER_BIAS;
             }
-        } else if (lapsAroundTheSun == 1) {
+        } else if (COOUNTER_LAPS_AROUND_THE_SUN == 1) {
+            // TODO: untested
             // reduce speed and check for obstacle
-        } else if (lapsAroundTheSun > 1) {
+            max_speed_car = 0.3;
+            checkForObstacle();
+        } else if (COOUNTER_LAPS_AROUND_THE_SUN > 1) {
             // dance
         }
         
@@ -181,24 +231,45 @@ namespace Steer{
 
     bool isFinishFlag(const std::vector<int>& cameraOutput, int blackThreshold, int whiteThreshold, int minSegmentLength) {
         int segmentLength = 0;
-        bool isBlack = false;
+        int number_checkers = 0;
+        bool isBlack = true;
         for (int pixel : cameraOutput) {
-            if (pixel > blackThreshold && !isBlack) {
-                if (segmentLength >= minSegmentLength) {
-                    return true;
-                }
-                segmentLength = 1;
-                isBlack = true;
-            } else if (pixel < whiteThreshold && isBlack) {
-                if (segmentLength >= minSegmentLength) {
-                    return true;
-                }
-                segmentLength = 1;
-                isBlack = false;
-            } else {
+            // if pixel is above black threshold and we weren't black before
+            if (pixel > blackThreshold && isBlack) {
                 segmentLength++;
+            } else {
+                // count switch if we're above desired checker threshold
+                if(segmentLength > THRESHOLD_CHECKER_SIZE) {
+                    number_checkers++;
+                }
+                segmentLength = 0;
+                isBlack = false;
+            }
+
+            // if pixel is below threshold, it's white
+            if (pixel <= blackThreshold && !isBlack) {
+                segmentLength++;
+            } else {
+                if(segmentLength > THRESHOLD_CHECKER_SIZE) {
+                    number_checkers++;
+                }
+                segmentLength = 0;
+                isBlack = true;
             }
         }
+
+        if(number_checkers>THRESHOLD_CHECKER_COUNT) {
+            return true;
+        }
+
         return false;
+    }
+
+    void checkForObstacle() {
+        // TODO: implement
+        int dist_to_obstacle = Ultrasonic::distance();
+        if(dist_to_obstacle < 30) {
+            max_speed_car = 0;
+        }
     }
 }

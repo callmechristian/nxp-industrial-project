@@ -36,9 +36,14 @@ namespace Car {
     // Servo
     Servo servo(D3);
 
+    // Ultrasonic sensor
+    DigitalOut trig(D11);
+    DigitalIn echo(D12);
+
     // Serial communication
     BufferedSerial serialPC(USBTX, USBRX); 
     BufferedSerial serial(D1, D0);
+
 
     // threads
     Thread steerThread;

@@ -19,6 +19,8 @@ namespace Car {
     extern DigitalOut clk;
     extern DigitalOut si;
     extern AnalogIn analogIn;
+    extern DigitalOut trig;
+    extern DigitalIn echo;
 
     // Rear Motors
     extern Servo motor_r;

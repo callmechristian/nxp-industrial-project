@@ -10,6 +10,6 @@ namespace Steer {
     bool isSerpentineSection(const std::vector<double>& centerHistory, double maxDeviation);
     bool isFinishFlag(const std::vector<int>& cameraOutput, int blackThreshold, int whiteThreshold, int minSegmentLength);
     double compute_center();
-
+    void checkForObstacle();
     void steerLoop();
 }
