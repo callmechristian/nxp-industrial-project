@@ -4,6 +4,9 @@
 #include "mbed.h"
 #include "Car.h"
 #include <iostream>
+#include <string>
+
+#include "Steer.h"
 
 
 // Exposure rate in milliseconds
@@ -13,6 +16,10 @@ using namespace Car;
 
 namespace Camera{
     int cameraData[128];  
+    Kernel::Clock::duration_u32 exposureTime = 25ms;
+
+    bool calibrated = false;
+
     // int steeringAngle = 50;
 
     void cameraLoop()
@@ -72,7 +79,7 @@ namespace Camera{
             clockPulse();
         }
 
-        ThisThread::sleep_for(EXPOSURE_TIME);
+        ThisThread::sleep_for(exposureTime);
     }
 
     void sendReading()
@@ -81,14 +88,90 @@ namespace Camera{
         {
             std::string s = std::to_string(cameraData[i])+",";
             
-            serial.write(&s, s.size());
+            // serial.write(&s, s.size());
+            serialPC.write(&s, s.size());
             
         }
-        serial.write((char*)",\n",2);
+        // serial.write((char*)",\n",2);
+        serialPC.write((char*)",\n",2); 
     }
     
 
     void calibrateCamera(){
+        // IDEA:
+            // find the darkest pixel, increase exposure time, recursively run function again, until exposure time too high and all pixels are white, then decrease exposure time by a fraction and set Steer::threshold to maybe 10% of the highest pixel value
+
+        std::cout << "Calibrating" << std::endl;
+
+        if (!calibrated)
+        {
+            int maxVal = 0;
+            int sum = 0;
+            int count = 0;
+            float mean = 0;
+
+            for (int i = 0; i < 128; i++)
+            {
+                if (Camera::cameraData[i] > maxVal){
+                    maxVal = Camera::cameraData[i];
+                    if (Camera::cameraData[i]>0)
+                    {
+                        sum += Camera::cameraData[i];
+                        count++;
+                    }
+                }
+            }
+            mean = float(sum) / count;
+            std::cout << std::to_string(int(mean)) << std::endl;
+
+            // if (maxVal == 0)
+            // {
+            //     exposureTime = exposureTime/10;
+            //     calibrated = true;
+            // }
+            // else
+            // {
+            //     exposureTime = 5*exposureTime;
+            // }
+            // printf("calibrated %d\n", exposureTime.count());
+            // calibrateCamera();
+        }
+        
+        int leftLine=0;
+        int rightLine=0;
+        
+        // find right line
+        // for (int i = 64; i < 128; i++)
+        // {
+        //     if (Camera::cameraData[i] > Steer::threshold){
+        //         rightLine = i;
+        //         break;
+        //     }
+        // }
+
+        // // find left line
+        // for (int i = 64; i > 0; i--)
+        // {
+        //     if (Camera::cameraData[i] > Steer::threshold){
+        //         leftLine = i;
+        //         break;
+        //     }
+        // }
+
+        
+        // if (leftLine == 0 || rightLine == 0)
+        // {
+        //     Steer::threshold = Steer::threshold/10;
+        //     calibrateCamera();
+        // }
+
+        // if (float(Steer::threshold)/cameraData[leftLine] > 0.6 || float(Steer::threshold)/cameraData[rightLine] > 0.6)
+        // {
+        //     Steer::threshold = Steer::threshold*0.5;
+        //     calibrateCamera();
+        // }
+
+
 
     }
 }

@@ -19,14 +19,21 @@ namespace Car {
     extern AnalogIn analogIn;
 
     // Rear Motors
-    extern PwmOut motor;
+    extern Servo leftMotor;
+    extern Servo rightMotor;
 
     // Servo
     extern Servo servo;
+
+    // Ultrasonic
+    extern DigitalOut trig;
+    extern DigitalIn echo;
 
     // Serial communication
     extern BufferedSerial serialPC;
     extern BufferedSerial serial; // tx, rx
 
     void MainCarLoop();
+    void upPressed();
+    void downPressed();
 }

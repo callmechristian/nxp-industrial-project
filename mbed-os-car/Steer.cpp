@@ -7,6 +7,7 @@
 
 namespace Steer{
     int steeringAngle = 50;
+    int threshold = 500;
 
     void initializeServo(){
         ThisThread::sleep_for(3s);
@@ -21,15 +22,51 @@ namespace Steer{
     }
 
     void calculateSteer(){
+        // TODO: if no pixel over threshold, change saturation or lower threshold
+        // int leftLine=-1;
+        // int rightLine=-1;
+        
+        // // find right line
+        // for (int i = 64; i < 128; i++)
+        // {
+        //     if (Camera::cameraData[i] > threshold){
+        //         rightLine = i;
+        //         break;
+        //     }
+        // }
 
-        int THRESHOLD = 500;
+        // // find left line
+        // for (int i = 64; i > 0; i--)
+        // {
+        //     if (Camera::cameraData[i] > threshold){
+        //         leftLine = i;
+        //         break;
+        //     }
+        // }
+
+        // int center = (leftLine + rightLine) / 2;
+        // // serial.write(&s, s.size());
+        // float kp = -1.5;
+        // float displacement = kp*(64 - center);
+        // // if (displacement < 4){
+        // //     return;
+        // // }
+        // if (leftLine == -1)
+        // {
+        //     displacement = -1.5*30;
+        // }
+        // else if(rightLine == -1)
+        // {
+        //     displacement = 1.5*30;
+        // }
+        
         int leftLine=0;
         int rightLine=0;
         std::vector<int> over;
 
         for (int i = 0; i < 128; i++)
         {
-            if (Camera::cameraData[i] > THRESHOLD){
+            if (Camera::cameraData[i] > threshold){
                 over.push_back(i);
             }
         }
@@ -53,12 +90,13 @@ namespace Steer{
         rightLine = sumR/countR;
 
         int center = (leftLine + rightLine) / 2;
-        // serial.write(&s, s.size());
-        int displacement = -4*(64 - center);
+        int kp = -4;
+        int displacement = kp*(64 - center);
         // angle_ = int((double(64+displacement)/128.0)*150);
         steeringAngle = 50+displacement;
         
         std::string s = std::to_string(center)+"\t"+ std::to_string(steeringAngle)+"\n";
+        // ThisThread::sleep_for(1ms);
     }
 
     void steerLoop(){
@@ -68,4 +106,4 @@ namespace Steer{
             ThisThread::sleep_for(10ms);
         }
     }
-}
+} // namespace Steer

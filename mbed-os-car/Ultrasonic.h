@@ -1,0 +1,3 @@
+namespace Ultrasonic {
+    int distance();
+}

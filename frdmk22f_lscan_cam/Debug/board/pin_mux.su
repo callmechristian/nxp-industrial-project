@@ -1,7 +1,0 @@
-C:\Users\siman\OneDrive\Desktop\SA\NXP-CUP\nxp-industrial-project\frdmk22f_lscan_cam\drivers/fsl_clock.h:627:20:CLOCK_EnableClock	24	static
-C:\Users\siman\OneDrive\Desktop\SA\NXP-CUP\nxp-industrial-project\frdmk22f_lscan_cam\drivers/fsl_port.h:322:20:PORT_SetPinConfig	32	static
-C:\Users\siman\OneDrive\Desktop\SA\NXP-CUP\nxp-industrial-project\frdmk22f_lscan_cam\drivers/fsl_port.h:425:20:PORT_SetPinMux	24	static
-../board/pin_mux.c:37:6:BOARD_InitBootPins	8	static
-../board/pin_mux.c:62:6:BOARD_InitPins	8	static
-../board/pin_mux.c:119:6:LSCAN_CAM	32	static
-../board/pin_mux.c:201:6:LSCAN_CAM_deinit	24	static
